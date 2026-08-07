@@ -1,6 +1,7 @@
 import datetime
 
 from games import fruitmachine, roulette
+from games.helpers import print_title
 
 CASINO_NAME = "Casino de Gouden Driehoek"
 TICKET_PRICE = 9.99
@@ -12,11 +13,21 @@ STANDARD_COSTS = TICKET_PRICE + DRINK_PRICE + TAX
 
 
 def calculate_age(birthdate):
+    """
+    This function calculates the age using a birthdate.
+    :param birthdate: birthdate (dd-mm-yyyy) of a user
+    :return: age
+    """
     birth_day, birth_month, birth_year = birthdate.split("-")
     return CURRENT_DATE.year - int(birth_year)
 
 
 def check_age(birthdate):
+    """
+    This function checks if the age of the user is above the MIN_AGE or not.
+    :param birthdate: birthdate (dd-mm-yyyy) of a user
+    :return: birthdate or exit
+    """
     age = calculate_age(birthdate)
 
     if age < MIN_AGE:
@@ -28,6 +39,13 @@ def check_age(birthdate):
 
 
 def determine_salutation(first_name, last_name, gender):
+    """
+    This function determines the appropriate salutation to the user, using their gender.
+    :param first_name: first name of a user
+    :param last_name: last name of a user
+    :param gender: gender (m/v/x) of a user
+    :return: string with salutation or None
+    """
     if gender == "v":
         return f"mevrouw {last_name}"
     elif gender == "m":
@@ -40,10 +58,21 @@ def determine_salutation(first_name, last_name, gender):
 
 
 def calculate_starting_budget(start_budget: float):
+    """
+    This function calculates the starting budget.
+    :param start_budget: starting budget in euros (float)
+    :return: new starting budget in euros (float)
+    """
     return start_budget - STANDARD_COSTS
 
 
 def show_welcome_message(start_budget: float, salutation, balance):
+    """
+    Prints a personal welcome message.
+    :param start_budget: starting budget in euros (float)
+    :param salutation: appropriate salutation for the user (string)
+    :param balance: current balance of the user in euros (float)
+    """
     print()
     print(CASINO_NAME)
     print("-" * len(CASINO_NAME))
@@ -56,9 +85,14 @@ def show_welcome_message(start_budget: float, salutation, balance):
     enough_saldo = True if balance >= 0 else False
     conclusion = "Je hebt nog genoeg budget voor toegang tot het casino." if enough_saldo == True else "Je hebt niet voldoende budget voor toegang tot het casino."
     print(conclusion)
+    print()
 
 
 def show_current_balance(balance):
+    """
+    Prints current balance of the user.
+    :param balance: current balance of the user in euros (float)
+    """
     print(f"Huidig saldo: €{balance:.2f}")
 
 
@@ -82,26 +116,32 @@ def main():
 
         match choice:
             case 1:
+                print()
+                print_title(CASINO_NAME, "spellen")
                 print("Kies één van de volgende spellen: 1 Fruitmachine, 2 Roulette, 0 Terug.")
                 game_choice = int(input("Kies een spel: "))
                 if game_choice == 1:
-                    balance = fruitmachine.play_fruitmachine(balance)
+                    balance = fruitmachine.play_fruitmachine(balance, CASINO_NAME)
                 elif game_choice == 2:
-                    balance = roulette.play_roulette(balance)
+                    balance = roulette.play_roulette(balance, CASINO_NAME)
                 else:
                     continue
             case 2:
-                print("Je hebt gekozen voor 'Saldo'.")
+                print()
+                print_title(CASINO_NAME, "saldo")
                 show_current_balance(balance)
             case 3:
-                print("Je hebt gekozen voor 'Account'.")
+                print()
+                print_title(CASINO_NAME, "account")
                 print(f"Naam: {first_name} {last_name}")
                 print(f"Aanspreekvorm: {salutation}")
                 print(f"Geboortedatum: {dob}")
                 print(f"Leeftijd: {calculate_age(dob)}")
             case 0:
-                print(f"Eindsaldo: €{balance:.f2}")
+                print()
+                print(f"Eindsaldo: €{balance:.2f}")
                 break
+
 
 if __name__ == '__main__':
     main()

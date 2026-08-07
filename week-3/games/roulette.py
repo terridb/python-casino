@@ -1,12 +1,25 @@
 import random
-from games.helpers import ask_for_bet
+from games.helpers import ask_for_bet, print_game_intro
+
 
 def show_roulette_options():
+    """
+    Prints roulette options.
+    :return: input from user (int)
+    """
+    print()
     print("Kies één van de volgende opties: 1 rood, 2 zwart, 3 even, 4 oneven, 0 stop")
-    return int(input("Kies je gok (0 om te stoppen): "))
+    return int(input("Kies je gok: "))
 
 
 def determine_win(color, choice, odd_even):
+    """
+    Determines if the user has won the game or not.
+    :param color: color of the spin (string)
+    :param choice: choice of the user (int)
+    :param odd_even: if the spun number is odd or even (string)
+    :return: win (boolean)
+    """
     win = False
     if color == "groen":
         win = True
@@ -21,22 +34,29 @@ def determine_win(color, choice, odd_even):
     return win
 
 
-def play_roulette(balance: float):
+def play_roulette(balance: float, casino):
+    """
+    Starts the roulette game.
+    :param casino: Casino name
+    :param balance: current balance of the user (float)
+    :return: balance (float)
+    """
     while True:
-        print(f"Je hebt Roulette gekozen. Je huidige saldo is {balance}")
+        print()
+        print_game_intro(casino, balance, "roulette")
         choice = show_roulette_options()
 
         if choice == 0:
             break
         elif choice > 4:
             print("Dat is geen geldige keuze. Probeer opnieuw.")
+            print()
             continue
 
         stake = ask_for_bet(balance)
         balance -= stake
 
         spin = random.randint(-1, 37)
-        color = ""
         odd_even = ""
 
         if spin == 0:
@@ -64,15 +84,9 @@ def play_roulette(balance: float):
             print(f"Je wint €{(stake * 5):.2f}!")
         elif win == True and not color == "groen":
             balance += (stake * 2)
-            print(f"Je wint €{stake:.2f}!")
+            print(f"Je wint €{(stake * 2):.2f}!")
         else:
             print(f"Je verliest €{stake:.2f}.")
 
-        play_again = input("Wil je nog een keer spelen (j/n)? ")
-        if play_again == "j":
-            continue
-        else:
-            break
-
-    print(f"Je huidige saldo is €{balance:.2f}.")
+    print(f"Je nieuwe saldo is €{balance:.2f}.")
     return balance
