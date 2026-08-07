@@ -1,6 +1,6 @@
 import datetime
 
-from games import fruitmachine, roulette
+from games import fruitmachine, roulette, blackjack
 from games.helpers import print_title
 
 CASINO_NAME = "Casino de Gouden Driehoek"
@@ -118,18 +118,21 @@ def main():
             case 1:
                 print()
                 print_title(CASINO_NAME, "spellen")
-                print("Kies één van de volgende spellen: 1 Fruitmachine, 2 Roulette, 0 Terug.")
+                print("Kies één van de volgende spellen: 1 Fruitmachine, 2 Roulette, 3 Blackjack, 0 Terug.")
                 game_choice = int(input("Kies een spel: "))
                 if game_choice == 1:
                     balance = fruitmachine.play_fruitmachine(balance, CASINO_NAME)
                 elif game_choice == 2:
                     balance = roulette.play_roulette(balance, CASINO_NAME)
+                elif game_choice == 3:
+                    balance = blackjack.play_blackjack(balance, CASINO_NAME)
                 else:
                     continue
             case 2:
                 print()
                 print_title(CASINO_NAME, "saldo")
                 show_current_balance(balance)
+                print()
             case 3:
                 print()
                 print_title(CASINO_NAME, "account")
@@ -137,6 +140,7 @@ def main():
                 print(f"Aanspreekvorm: {salutation}")
                 print(f"Geboortedatum: {dob}")
                 print(f"Leeftijd: {calculate_age(dob)}")
+                print()
             case 0:
                 print()
                 print(f"Eindsaldo: €{balance:.2f}")

@@ -7,9 +7,14 @@ def show_roulette_options():
     Prints roulette options.
     :return: input from user (int)
     """
-    print()
-    print("Kies één van de volgende opties: 1 rood, 2 zwart, 3 even, 4 oneven, 0 stop")
-    return int(input("Kies je gok: "))
+    while True:
+        print()
+        print("Kies één van de volgende opties: 1 rood, 2 zwart, 3 even, 4 oneven, 0 stop")
+        choice = int(input("Kies je gok: "))
+        if choice not in (0, 1, 2, 3, 4):
+            print("Ongeldige input. Probeer opnieuw.")
+        else:
+            return choice
 
 
 def determine_win(color, choice, odd_even):
