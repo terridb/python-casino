@@ -1,31 +1,26 @@
-from games.helpers import ask_for_bet, print_game_intro
+from rich.console import Console
+from rich.panel import Panel
+from rich import print
 
+from games.helpers import ask_for_bet
 
-def determine_rolls(round_number):
+from random import choice
+
+console = Console()
+
+ICONS = [":cherries:", ":lemon:", ":star:", ":banana:", ":dragon:"]
+
+def determine_rolls():
     """
     Determines the rolls of the round.
-    :param round_number: number of the round
     :return: tuple with strings
     """
-    match round_number % 9:
-        case 0:
-            return "kers", "citroen", "ster"
-        case 1:
-            return "kers", "kers", "kers"
-        case 2:
-            return "ster", "ster", "citroen"
-        case 3:
-            return "citroen", "kers", "ster"
-        case 4:
-            return "ster", "ster", "ster"
-        case 5:
-            return "citroen", "citroen", "citroen"
-        case 6:
-            return "kers", "ster", "kers"
-        case 7:
-            return "citroen", "ster", "citroen"
-        case 8:
-            return "ster", "kers", "citroen"
+
+    roll1 = choice(ICONS)
+    roll2 = choice(ICONS)
+    roll3 = choice(ICONS)
+
+    return roll1, roll2, roll3
 
 
 def determine_payout(roll1, roll2, roll3, stake: float):
@@ -52,10 +47,8 @@ def play_fruitmachine(balance: float, casino):
        :param balance: current balance of the user (float)
        :return: balance (float)
        """
-    round_number = 1
     while True:
-        print()
-        print_game_intro(casino, balance, "fruitmachine")
+        console.print(Panel(f"Huidig saldo: €{balance:.2f}", title=f"{casino} - fruitmachine"))
         choice = input("Druk op enter om te spelen of typ stop om terug te gaan: ")
 
         if choice == "stop":
@@ -65,15 +58,14 @@ def play_fruitmachine(balance: float, casino):
         stake = ask_for_bet(balance)
         balance -= stake
 
-        roll1, roll2, roll3 = determine_rolls(round_number)
-        print(f"Je hebt {roll1}, {roll2} en {roll3} gedraaid.")
+        roll1, roll2, roll3 = determine_rolls()
+        console.print(Panel(f"Rollen: {roll1} | {roll2} | {roll3}", title="Output"))
         payout = determine_payout(roll1, roll2, roll3, stake)
 
         if payout > 0:
             balance += payout
-            print(f"Je hebt €{payout:.2f} gewonnen!")
+            console.print(f"[sea_green3]Je hebt €{payout:.2f} gewonnen!")
         else:
-            print(f"Je hebt verloren. Je verliest €{stake:.2f}")
+            console.print(f"[red3]Je hebt verloren. Je verliest €{stake:.2f}")
 
-        print(f"Je nieuwe saldo is €{balance:.2f}.")
-        round_number += 1
+        console.print(f"Je nieuwe saldo is €{balance:.2f}.")

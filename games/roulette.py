@@ -1,5 +1,12 @@
-import random
-from games.helpers import ask_for_bet, print_game_intro
+from random import randint
+
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
+from games.helpers import ask_for_bet
+
+console = Console()
 
 
 def show_roulette_options():
@@ -8,11 +15,18 @@ def show_roulette_options():
     :return: input from user (int)
     """
     while True:
-        print()
-        print("Kies één van de volgende opties: 1 rood, 2 zwart, 3 even, 4 oneven, 0 stop")
+        table = Table(expand=True)
+        table.add_column("Optie")
+        table.add_column("Actie")
+        table.add_row("1", "Rood")
+        table.add_row("2", "Zwart")
+        table.add_row("3", "Even")
+        table.add_row("4", "Oneven")
+        table.add_row("0", "Stop")
+        console.print(Panel.fit(table, title="Roulette"))
         choice = int(input("Kies je gok: "))
         if choice not in (0, 1, 2, 3, 4):
-            print("Ongeldige input. Probeer opnieuw.")
+            console.print("[red3]Ongeldige input. Probeer opnieuw.")
         else:
             return choice
 
@@ -47,21 +61,19 @@ def play_roulette(balance: float, casino):
     :return: balance (float)
     """
     while True:
-        print()
-        print_game_intro(casino, balance, "roulette")
+        console.print(Panel(f"Huidig saldo: €{balance:.2f}", title=f"{casino} - roulette"))
         choice = show_roulette_options()
 
         if choice == 0:
             break
         elif choice > 4:
-            print("Dat is geen geldige keuze. Probeer opnieuw.")
-            print()
+            console.print("[red3]Dat is geen geldige keuze. Probeer opnieuw.")
             continue
 
         stake = ask_for_bet(balance)
         balance -= stake
 
-        spin = random.randint(-1, 37)
+        spin = randint(0, 36)
         odd_even = ""
 
         if spin == 0:
@@ -86,12 +98,14 @@ def play_roulette(balance: float, casino):
 
         if win == True and color == "groen":
             balance += (stake * 6)
-            print(f"Je wint €{(stake * 5):.2f}!")
+            outcome = f"[sea_green3]Je wint €{(stake * 5):.2f}!"
         elif win == True and not color == "groen":
             balance += (stake * 2)
-            print(f"Je wint €{(stake * 2):.2f}!")
+            outcome = f"[sea_green3]Je wint €{(stake * 2):.2f}!"
         else:
-            print(f"Je verliest €{stake:.2f}.")
+            outcome = f"[red3]Je verliest €{stake:.2f}."
 
-    print(f"Je nieuwe saldo is €{balance:.2f}.")
+        console.print(Panel(f"Geland op {spin}\n{outcome}", title="Output"))
+
+    console.print(f"Je nieuwe saldo is €{balance:.2f}.")
     return balance

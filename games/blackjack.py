@@ -1,9 +1,14 @@
 import random
 
-from games.helpers import print_game_intro, ask_for_bet
+from rich.console import Console
+from rich.panel import Panel
+
+from games.helpers import ask_for_bet
 
 SUITS = ["♠", "♥", "♦", "♣"]
 RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+
+console = Console()
 
 
 def create_deck():
@@ -20,12 +25,14 @@ def draw_card(deck, hand):
 
 def show_hand(hand, label, hide_card=False):
     if label == "player":
-        print(f"Jouw hand: {" | ".join(hand)}")
+        outcome = f"Jouw hand: {" | ".join(hand)}"
     else:
         if hide_card:
-            print(f"Dealer hand: {hand[0]} | ??")
+            outcome = f"Dealer hand: {hand[0]} | ??"
         else:
-            print(f"Dealer hand: {" | ".join(hand)}")
+            outcome = f"Dealer hand: {" | ".join(hand)}"
+
+    console.print(Panel(outcome, title="Hand"))
 
 
 def calculate_card_value(card):
@@ -61,24 +68,25 @@ def determine_win(hand_dealer, hand_player, balance, stake):
     if total_dealer > 21:
         win = stake * 2
         balance += win
-        print(f"Je wint van de dealer: €{win:.2f}!")
+        outcome = f"[sea_green3]Je wint van de dealer: €{win:.2f}!"
     elif total_player > total_dealer:
         win = stake * 1.5
         balance += win
-        print(f"Je wint van de dealer: €{win:.2f}!")
+        outcome = f"[sea_green3]Je wint van de dealer: €{win:.2f}!"
     elif total_dealer == total_player:
         balance += stake
-        print("Gelijkspel! Je krijgt je inzet terug.")
+        outcome = "[gold1]Gelijkspel! Je krijgt je inzet terug."
     else:
-        print("Verloren van de dealer.")
+        outcome = "[red3]Verloren van de dealer."
+
+    console.print(Panel(outcome, title="Output"))
 
     return balance
 
 
 def play_blackjack(balance: float, casino):
     while True:
-        print()
-        print_game_intro(casino, balance, "blackjack")
+        console.print(Panel(f"Huidig saldo: €{balance:.2f}", title=f"{casino} - blackjack"))
         stake = ask_for_bet(balance)
         balance -= stake
 
@@ -91,7 +99,7 @@ def play_blackjack(balance: float, casino):
         draw_card(deck, hand_player)
         show_hand(hand_player, "player")
         show_hand(hand_dealer, "dealer", True)
-        print(f"Jouw totaal: {calculate_hand_value(hand_player)}")
+        console.print(f"Jouw totaal: {calculate_hand_value(hand_player)}")
 
         while calculate_hand_value(hand_player) < 21:
             hit_or_stand = input("Kies hit of stand: ").strip().lower()
@@ -99,25 +107,25 @@ def play_blackjack(balance: float, casino):
                 break
             elif hit_or_stand == "hit":
                 card = draw_card(deck, hand_player)
-                print(f"Je trekt: {card}")
+                console.print(f"Je trekt: {card}")
                 show_hand(hand_player, "player")
-                print(f"Jouw totaal: {calculate_hand_value(hand_player)}")
+                console.print(f"Jouw totaal: {calculate_hand_value(hand_player)}")
 
                 if calculate_hand_value(hand_player) > 21:
-                    print("Bust!")
+                    console.print("[red3]Bust!")
                     return balance
             else:
-                print("Incorrecte input. Probeer opnieuw.")
+                console.print("[red3]Incorrecte input. Probeer opnieuw.")
                 continue
 
         show_hand(hand_dealer, "dealer")
         while calculate_hand_value(hand_dealer) < 17:
             card = draw_card(deck, hand_dealer)
-            print(f"Dealer trekt: {card}")
+            console.print(f"Dealer trekt: {card}")
             show_hand(hand_dealer, "dealer")
 
-        print(f"Jouw totaal: {calculate_hand_value(hand_player)}")
-        print(f"Dealer totaal: {calculate_hand_value(hand_dealer)}")
+        console.print(f"Jouw totaal: {calculate_hand_value(hand_player)}")
+        console.print(f"Dealer totaal: {calculate_hand_value(hand_dealer)}")
         balance = determine_win(hand_dealer, hand_player, balance, stake)
-        print(f"Nieuw saldo: €{balance:.2f}")
+        console.print(f"Nieuw saldo: €{balance:.2f}")
         return balance
